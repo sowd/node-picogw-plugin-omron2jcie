@@ -1,0 +1,27 @@
+{
+  "name": "picogw-plugin-db",
+  "version": "0.0.1",
+  "description": "DB plugin of picogw",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KAIT-HEMS/node-picogw-plugin-db.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KAIT-HEMS/node-picogw-plugin-db/issues"
+  },
+  "homepage": "https://github.com/KAIT-HEMS/node-picogw-plugin-db#readme",
+  "picogw": {
+    "role": [
+      "server"
+    ]
+  },
+  "dependencies": {
+    "node-localstorage": "^1.3.0"
+  }
+}
