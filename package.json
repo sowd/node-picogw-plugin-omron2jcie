@@ -4,7 +4,8 @@
   "description": "DB plugin of picogw",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,9 @@
   },
   "dependencies": {
     "node-localstorage": "^1.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.14.0",
+    "eslint-config-google": "^0.9.1"
   }
 }
