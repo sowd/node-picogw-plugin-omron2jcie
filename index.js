@@ -38,7 +38,7 @@ function onProcCall(method, path, args) {
     case 'PUT':
         try {
             localStorage.setItem(path, JSON.stringify(args));
-            pi.publish(path, args); // PubSub
+            pi.server.publish(path, args); // PubSub
             return {success: true};
         } catch (e) {
             return {error: 'Data should be in JSON format.'};
@@ -46,7 +46,7 @@ function onProcCall(method, path, args) {
     case 'DELETE':
         if (path == '') localStorage.clear();
         else localStorage.removeItem(path);
-        pi.publish(path, {}); // PubSub
+        pi.server.publish(path, {}); // PubSub
         return {success: true};
     default:
         return {error: `The specified method ${method} is not implemented in admin plugin.`}; // eslint-disable-line max-len
