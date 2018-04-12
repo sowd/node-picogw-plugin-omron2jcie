@@ -33,7 +33,7 @@ function onProcCall(method, path, args) {
             return listKeys(args);
         }
         re = localStorage.getItem(path);
-        return (re == null ? {error: 'No such path:'+path} : re);
+        return (re == null ? {errors:[{error: 'No such path:'+path}]} : re);
     case 'POST':
     case 'PUT':
         try {
@@ -41,7 +41,7 @@ function onProcCall(method, path, args) {
             pi.server.publish(path, args); // PubSub
             return {success: true};
         } catch (e) {
-            return {error: 'Data should be in JSON format.'};
+            return {errors:[{error: 'Data should be in JSON format.'}]};
         }
     case 'DELETE':
         if (path == '') localStorage.clear();
@@ -49,7 +49,7 @@ function onProcCall(method, path, args) {
         pi.server.publish(path, {}); // PubSub
         return {success: true};
     default:
-        return {error: `The specified method ${method} is not implemented in admin plugin.`}; // eslint-disable-line max-len
+        return {errors:[{error: `The specified method ${method} is not implemented in admin plugin.`}]}; // eslint-disable-line max-len
     }
 }
 
