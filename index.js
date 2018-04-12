@@ -33,7 +33,7 @@ function onProcCall(method, path, args) {
             return listKeys(args);
         }
         re = localStorage.getItem(path);
-        return (re == null ? {errors:[{error: 'No such path:'+path}]} : re);
+        return (re == null ? {errors: [{error: 'No such path:'+path}]} : re);
     case 'POST':
     case 'PUT':
         try {
@@ -41,7 +41,7 @@ function onProcCall(method, path, args) {
             pi.server.publish(path, args); // PubSub
             return {success: true};
         } catch (e) {
-            return {errors:[{error: 'Data should be in JSON format.'}]};
+            return {errors: [{error: 'Data should be in JSON format.'}]};
         }
     case 'DELETE':
         if (path == '') localStorage.clear();
@@ -49,7 +49,7 @@ function onProcCall(method, path, args) {
         pi.server.publish(path, {}); // PubSub
         return {success: true};
     default:
-        return {errors:[{error: `The specified method ${method} is not implemented in admin plugin.`}]}; // eslint-disable-line max-len
+        return {errors: [{error: `The specified method ${method} is not implemented in admin plugin.`}]}; // eslint-disable-line max-len
     }
 }
 
@@ -62,6 +62,7 @@ function listKeys(args) {
         if (bInfo) re._info={leaf: false};
         for (let i=0; i<localStorage.length; i++) {
             const key = localStorage.key(i);
+            if (key == 'MACtoIP') continue;
             re[key] = {};
             if (bInfo) {
                 const size = localStorage.getItem(key).length;
