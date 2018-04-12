@@ -33,11 +33,11 @@ function onProcCall(method, path, args) {
             return listKeys(args);
         }
         re = localStorage.getItem(path);
-        return (re == null ? {error: 'No such path:'+path} : JSON.parse(re));
+        return (re == null ? {error: 'No such path:'+path} : re);
     case 'POST':
     case 'PUT':
         try {
-            localStorage.setItem(path, JSON.stringify(args));
+            localStorage.setItem(path, args);
             pi.server.publish(path, args); // PubSub
             return {success: true};
         } catch (e) {
@@ -57,13 +57,15 @@ function onProcCall(method, path, args) {
 // eslint-disable-next-line require-jsdoc
 function listKeys(args) {
     return new Promise((rslv) => {
+        const bInfo = (args && args.info === 'true');
         const re = {};
+        if (bInfo) re._info={leaf: false};
         for (let i=0; i<localStorage.length; i++) {
             const key = localStorage.key(i);
             re[key] = {};
-            if (args && args.option === 'true') {
+            if (bInfo) {
                 const size = localStorage.getItem(key).length;
-                re[key].option = {
+                re[key]._info = {
                     doc: {
                         short: size + ' byte',
                         // ,long : 'Optional long message'

@@ -1,6 +1,6 @@
 {
   "name": "picogw-plugin-db",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "DB plugin of picogw",
   "main": "index.js",
   "scripts": {
