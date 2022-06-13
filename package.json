@@ -1,5 +1,5 @@
 {
-  "name": "picogw-plugin-omron2jcie",
+  "name": "picogw-plugin-omron2jcie-bu01",
   "version": "0.0.1",
   "description": "PicoGW plgin for Omron's  2jcie USB sensor",
   "main": "index.js",
