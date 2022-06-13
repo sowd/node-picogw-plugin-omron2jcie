@@ -7,7 +7,7 @@ Note it requires sudo operation during initialization. It is recommended that th
 
 You can also pre-execute setup.sh before running this plugin.
 
-#### GET /v1/omron2jcie-bu/
+#### GET /v1/omron2jcie-bu01/
 
 Show all sensor values.
 
