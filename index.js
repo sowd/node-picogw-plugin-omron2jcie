@@ -1,3 +1,6 @@
+const sudo = require('sudo');
+const omron2jciebu = require('@e53e04ac/node-omron-2jcie-bu');
+
 let pi;
 let log = console.log; // eslint-disable-line no-unused-vars
 let localStorage;
@@ -12,10 +15,12 @@ module.exports = {
  * Initialize plugin
  * @param {object} pluginInterface The interface of picogw plugin
  */
-function init(pluginInterface) {
+async function init(pluginInterface) {
     pi = pluginInterface;
     log = pi.log;
     localStorage = pi.localStorage;
+
+    await prepareSensor();
 }
 
 /**
@@ -25,56 +30,42 @@ function init(pluginInterface) {
  * @param {object} args parameters of this call
  * @return {object} Returns a Promise object or object containing the result
  */
-function onProcCall(method, path, args) {
+async function onProcCall(method, path, args) {
     let re;
     switch (method) {
     case 'GET':
         if (path === '') { // Request for members
-            return listKeys(args);
+	        const controller = omron2jciebu({ path: '/dev/ttyUSB0' });
+	        await controller.open();
+	        const latestData = await controller.latestDataLong.read({});
+	        await controller.close();
+	        return latestData;
         }
-        re = localStorage.getItem(path);
-        return (re == null ? {errors: [{error: 'No such path:'+path}]} : re);
-    case 'POST':
-    case 'PUT':
-        try {
-            localStorage.setItem(path, args);
-            pi.server.publish(path, args); // PubSub
-            return {success: true};
-        } catch (e) {
-            return {errors: [{error: 'Data should be in JSON format.'}]};
-        }
-    case 'DELETE':
-        if (path == '') localStorage.clear();
-        else localStorage.removeItem(path);
-        pi.server.publish(path, {}); // PubSub
-        return {success: true};
+        //re = localStorage.getItem(path);
+	break;
     default:
         return {errors: [{error: `The specified method ${method} is not implemented in admin plugin.`}]}; // eslint-disable-line max-len
     }
 }
 
+const sudoOpts = {
+    cachePassword: true,
+    prompt: 'Need password for sudo to enable Omron sensor ',
+    spawnOptions: { /* other options for spawn */ }
+};
 
-// eslint-disable-next-line require-jsdoc
-function listKeys(args) {
-    return new Promise((rslv) => {
-        const bInfo = (args && args.info === 'true');
-        const re = {};
-        if (bInfo) re._info={leaf: false};
-        for (let i=0; i<localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key == 'MACtoIP') continue;
-            re[key] = {};
-            if (bInfo) {
-                const size = localStorage.getItem(key).length;
-                re[key]._info = {
-                    doc: {
-                        short: size + ' byte',
-                        // ,long : 'Optional long message'
-                    },
-                    leaf: true,
-                };
-            }
-        }
-        rslv(re);
-    });
+function sudoAsync(argsArray,opts){ return new Promise((ac,rj)=>{
+        const child = sudo(argsArray,opts);
+        let outStr='';
+        child.stdout.on('data', function (data) {
+                outStr += data.toString();
+        });
+        child.stdout.on('close', function (code) { ac(outStr); });
+        child.stdout.on('error', function (err) { rj(err); });
+});}
+
+async function prepareSensor(){
+	await sudoAsync(['modprobe','ftdi_sio'],sudoOpts);
+	await sudoAsync(['chmod', '777', '/sys/bus/usb-serial/drivers/ftdi_sio/new_id'],sudoOpts);
+	await sudoAsync(['echo', '0590', '00d4', '>', '/sys/bus/usb-serial/drivers/ftdi_sio/new_id'],sudoOpts);
 }
